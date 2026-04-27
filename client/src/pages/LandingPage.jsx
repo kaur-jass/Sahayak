@@ -49,7 +49,7 @@ export default function LandingPage() {
           icon={Heart} title="Want to Help?" 
           description="Join as a volunteer and support those in need in your community."
           buttons={[
-            { text: "Register", variant: "primary", onClick: () => navigate("/volunteer/register") },
+            { text: "Register", variant: "primary", onClick: () => navigate("/volunteer/register")},
             { text: "Login", variant: "secondary", onClick: () => navigate("/volunteer/login") }
           ]}
         />
