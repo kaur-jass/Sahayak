@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Heart, CheckCircle2, ArrowLeft, Loader2 } from "lucide-react";
+import { Heart, CheckCircle2, ArrowLeft } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 const skillOptions = [
@@ -24,9 +24,6 @@ export default function VolunteerRegister() {
     availability: "available",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -43,46 +40,21 @@ export default function VolunteerRegister() {
     }));
   };
 
-  // 🔥 BACKEND READY SUBMIT
-  const handleSubmit = async (e) => {
+  // ✅ SIMPLE REGISTER (NO BACKEND)
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
-    try {
-      const response = await fetch("http://localhost:5000/api/volunteer/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    // save locally
+    localStorage.setItem("volunteer", JSON.stringify(formData));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Registration failed");
-      }
-
-      console.log("Success:", data);
-
-      // Optional: store user/token
-      localStorage.setItem("volunteer", JSON.stringify(data));
-
-      navigate("/volunteer-dashboard");
-
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // go to dashboard
+    navigate("/volunteer-dashboard");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] to-[#0f1433] flex flex-col items-center justify-center p-6">
 
-      {/* 🔙 Back Button */}
+      {/* Back */}
       <div className="w-full max-w-2xl mb-4">
         <Link
           to="/"
@@ -113,13 +85,6 @@ export default function VolunteerRegister() {
           onSubmit={handleSubmit}
           className="bg-[#0f1433]/60 border border-[#1a2048] rounded-2xl p-8 space-y-6"
         >
-
-          {/* Error */}
-          {error && (
-            <div className="bg-red-500/20 text-red-400 p-3 rounded-xl text-sm">
-              {error}
-            </div>
-          )}
 
           {/* Name */}
           <input
@@ -212,17 +177,9 @@ export default function VolunteerRegister() {
           {/* Submit */}
           <button
             type="submit"
-            disabled={loading}
-            className="w-full bg-[#FF8A00] py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
+            className="w-full bg-[#FF8A00] py-4 rounded-xl font-semibold"
           >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin" size={18} />
-                Registering...
-              </>
-            ) : (
-              "Register"
-            )}
+            Register
           </button>
 
         </form>
@@ -231,7 +188,7 @@ export default function VolunteerRegister() {
         <div className="mt-6 text-center">
           <p className="text-gray-500">
             Already registered?{" "}
-            <Link to="/login" className="text-[#FF8A00]">
+            <Link to="/volunteer/login" className="text-[#FF8A00]">
               Login
             </Link>
           </p>

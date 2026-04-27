@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, LogIn, Loader2 } from "lucide-react";
+import { ArrowLeft, LogIn } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
 export default function VolunteerLogin() {
@@ -9,9 +9,6 @@ export default function VolunteerLogin() {
     phone: "",
   });
 
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -19,46 +16,21 @@ export default function VolunteerLogin() {
     });
   };
 
-  const handleSubmit = async (e) => {
+ 
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError("");
 
-    try {
-      // BACKEND API (replace later)
-      const response = await fetch("http://localhost:5000/api/volunteer/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
+    // save locally
+    localStorage.setItem("volunteer", JSON.stringify(formData));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
-      }
-
-      console.log("Login Success:", data);
-
-      // Save user / token
-      localStorage.setItem("volunteer", JSON.stringify(data));
-
-      navigate("/volunteer-dashboard");
-
-    } catch (err) {
-      console.error(err);
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+    // go to dashboard
+    navigate("/volunteer-dashboard");
   };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#0a0e27] to-[#0f1433] flex flex-col items-center justify-center p-6">
 
-      {/* 🔙 Back */}
+      {/* Back */}
       <div className="w-full max-w-md mb-4">
         <Link
           to="/"
@@ -87,13 +59,6 @@ export default function VolunteerLogin() {
           className="bg-[#0f1433]/60 border border-[#1a2048] rounded-2xl p-8 space-y-6"
         >
 
-          {/* Error */}
-          {error && (
-            <div className="bg-red-500/20 text-red-400 p-3 rounded-xl text-sm">
-              {error}
-            </div>
-          )}
-
           {/* Phone */}
           <input
             type="tel"
@@ -105,23 +70,13 @@ export default function VolunteerLogin() {
             className="w-full px-4 py-3 bg-[#1a2048] rounded-xl text-white"
           />
 
-          {/* Submit */}
+          {/* Button */}
           <button
             type="submit"
-            disabled={loading}
             className="w-full bg-[#FF8A00] py-4 rounded-xl font-semibold flex items-center justify-center gap-2"
           >
-            {loading ? (
-              <>
-                <Loader2 className="animate-spin" size={18} />
-                Logging in...
-              </>
-            ) : (
-              <>
-                <LogIn size={18} />
-                Login
-              </>
-            )}
+            <LogIn size={18} />
+            Login
           </button>
 
         </form>
