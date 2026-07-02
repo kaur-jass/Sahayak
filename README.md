@@ -519,7 +519,7 @@ Mark notification as read
 
 Clone Repository
 
-git clone https://github.com/yourusername/sahayak.git
+git clone https://github.com/kaur-jass/Sahayak.git
 
 cd sahayak
 
@@ -655,3 +655,5 @@ Dr. B. R. Ambedkar National Institute of Technology, Jalandhar
 # License
 
 This project is developed for educational, research, and social impact purposes.
+
+#OPEN FOR CONTRIBUTIONS
