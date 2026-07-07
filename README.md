@@ -315,6 +315,7 @@ Purpose:
 
 # 8. Project Structure
 
+```text
 Sahayak/
 ├── client/
 │   ├── public/
