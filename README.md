@@ -225,6 +225,15 @@ Verification Queue
 → Approve / Reject Proof
 → Mission Closure
 
+## Citizen Feedback Workflow
+
+Citizen
+→ Open Feedback Widget
+→ Submit Feedback
+→ Store in MongoDB
+→ Coordinator Dashboard
+→ Review Community Feedback
+
 ---
 
 # 7. Technology Stack
@@ -307,72 +316,44 @@ Purpose:
 # 8. Project Structure
 
 Sahayak/
-
-client/
-
-src/
-
-components/
-
-pages/
-
-Admin/
-
-Volunteer/
-
-Citizen/
-
-services/
-
-utils/
-
-App.jsx
-
-main.jsx
-
-public/
-
-package.json
-
-server/
-
-models/
-
-Report.js
-
-Volunteer.js
-
-Task.js
-
-Verification.js
-
-Notification.js
-
-User.js
-
-routes/
-
-reports.js
-
-tasks.js
-
-volunteers.js
-
-notifications.js
-
-verifications.js
-
-middleware/
-
-uploads/
-
-utils/
-
-server.js
-
-package.json
-
-README.md
+├── client/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/        # Reusable UI parts (e.g., FeedbackForm.jsx)
+│   │   ├── pages/
+│   │   │   ├── Admin/         # Admin layouts (e.g., AdminDashboard.jsx)
+│   │   │   ├── Volunteer/
+│   │   │   └── Citizen/
+│   │   ├── services/          # API and WebSocket connection setups
+│   │   ├── utils/             # Helper functions
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── vite.config.js
+│
+├── server/
+│   ├── middleware/                # Auth & file upload filters
+│   ├── models/                    # MongoDB Database Schemas
+│   │   ├── Feedback.js            # Mongoose Schema for Citizen Feedback
+│   │   ├── Notification.js
+│   │   ├── Report.js
+│   │   ├── Task.js
+│   │   ├── User.js
+│   │   ├── Verification.js
+│   │   └── Volunteer.js
+│   ├── routes/                    # API Endpoint Handlers
+│   │   ├── feedbackRoutes.js      # GET/POST logic for community logs
+│   │   ├── notifications.js
+│   │   ├── reports.js
+│   │   ├── tasks.js
+│   │   ├── verifications.js
+│   │   └── volunteers.js
+│   ├── uploads/               # Local storage for images/attachments
+│   ├── utils/                 # Backend helpers (SMS, Mailers, Sockets)
+│   ├── server.js              # App entryway & Express server connection
+│   └── package.json
+│
+└── README.md
 
 ---
 
@@ -463,6 +444,23 @@ Fields:
 * read
 * createdAt
 
+
+## Feedback Collection
+
+Stores citizen feedback.
+
+Fields:
+
+* _id
+* fullName
+* email
+* phone
+* rating
+* feedback
+* category
+* timestamp
+
+
 ---
 
 # 10. API Endpoints
@@ -528,6 +526,17 @@ Fetch volunteer notifications
 PATCH /api/notifications/:id/read
 
 Mark notification as read
+
+
+## Feedback
+
+POST /api/feedback
+
+Submit citizen feedback
+
+GET /api/feedback
+
+Retrieve all feedback for coordinator dashboard
 
 ---
 
