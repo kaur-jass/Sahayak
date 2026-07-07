@@ -106,6 +106,22 @@ Features:
 
 ---
 
+## Citizen Feedback System
+
+Citizens can share their experience and suggestions regarding the emergency response process.
+
+Features:
+
+* Floating feedback widget on landing page
+* Responsive feedback popup
+* Collect citizen name, email and phone number
+* Five-star rating system
+* Written feedback submission
+* Secure MongoDB storage
+* Coordinator feedback monitoring
+
+---
+
 ## Administrative Dashboard
 
 The administrative dashboard provides centralized disaster management capabilities.
