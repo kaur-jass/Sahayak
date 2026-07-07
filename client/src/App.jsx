@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom"; // Link yaha add kiya hai
 
 // Import your pages
 import LandingPage from "./pages/LandingPage";
@@ -11,35 +11,32 @@ import VolunteerLogin from "./pages/VolunteerLogin";
 import AdminLogin from "./pages/AdminLogin";
 import AdminProtectedRoute from "./pages/AdminProtectedRoute";
 import Chatbot from "./pages/Chatbot";
-
-// Optional: Global Components (like a Navbar if you have one)
-// import Navbar from "./components/Navbar";
+import FeedbackForm from "./pages/FeedbackForm";
 
 function App() {
   return (
     <Router>
       <div className="min-h-screen bg-[#050816]">
-        {/* If you have a shared Navbar, place it here */}
         
+        {/* Floating Feedback Button (Bottom-Left) */}
+        <Link 
+          to="/feedback" 
+          className="fixed bottom-6 left-6 z-[9999] w-16 h-16 rounded-full bg-orange-500 text-white shadow-xl hover:scale-110 transition flex items-center justify-center border border-blue-500/40"
+          title="Give Feedback"
+        >
+          <span className="text-xl">📝</span>
+        </Link>
+
         <Routes>
-          {/* Main Landing Page - Third card leads to /admin */}
           <Route path="/" element={<LandingPage />} />
-
-          {/* User Reporting Page */}
           <Route path="/report" element={<ReportPage />} />
-
-          {/* Admin / Coordinator Dashboard */}
+          <Route path="/feedback" element={<FeedbackForm />} />
           <Route path="/admin" element={ <AdminProtectedRoute> <AdminDashboard /> </AdminProtectedRoute> } />
-
-          {/* Volunteer Dashboard */}
           <Route path="/volunteer" element={<VolunteerDashboard />} />
-          {/* Volunteer Registration */}
           <Route path="/volunteer/register" element={<VolunteerRegister />} />
-          {/* Volunteer Login */}
           <Route path="/volunteer/login" element={<VolunteerLogin />} />
-          {/* Admin Login */}
           <Route path="/admin-login" element={<AdminLogin />} />
-          {/* Fallback for 404 - Optional */}
+          
           <Route 
             path="*" 
             element={
@@ -49,6 +46,7 @@ function App() {
             } 
           />
         </Routes>
+        
         <Chatbot />
       </div>
     </Router>
