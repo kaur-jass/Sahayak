@@ -19,6 +19,7 @@ import taskRoutes from "./routes/tasks.js";
 import volunteerRoutes from "./routes/volunteers.js";
 import notificationRoutes from "./routes/notifications.js";
 import chatRoutes from "./routes/chat.js";
+import feedbackRoutes from "./routes/feedbackRoutes.js";
 
 const app = express();
 
@@ -34,6 +35,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/volunteers", volunteerRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/chat", chatRoutes);
+app.use("/api/feedback", feedbackRoutes);
 
 app.get("/cors-test", (req, res) => {
   res.json({

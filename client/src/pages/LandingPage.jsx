@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { AlertTriangle, Heart, ShieldCheck, ArrowRight } from "lucide-react";
+import { AlertTriangle, Heart, ShieldCheck, ArrowRight, MessageCircle, X } from "lucide-react";
+import FeedbackForm from "./FeedbackForm"; // Import the FeedbackForm component
 
 // --- Sub-component for Action Cards ---
 const ActionCard = ({ icon: Icon, title, description, buttons = [] }) => (
@@ -43,6 +44,7 @@ export default function LandingPage() {
   const [currentText, setCurrentText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
   const [typingSpeed, setTypingSpeed] = useState(100);
+  const [showFeedback, setShowFeedback] = useState(false);
 
   useEffect(() => {
     let timer;
@@ -162,6 +164,30 @@ export default function LandingPage() {
         />
       </div>
 
+      {/* Feedback Widget */}
+      <div className="fixed bottom-6 left-6 z-50">
+          <button
+            onClick={() => setShowFeedback((prev) => !prev)}
+            className="w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 shadow-2xl flex items-center justify-center transition-all hover:scale-110"
+          >
+            <MessageCircle className="text-white" size={28} />
+          </button>
+        </div>
+
+        {showFeedback && (
+          <div className="fixed inset-0 z-[999]">
+            <div
+              className="absolute inset-0 bg-black/50"
+              onClick={() => setShowFeedback(false)}
+            />
+
+            <div className="fixed left-6 bottom-24 z-[1000] w-[450px] max-w-[90vw]">
+              <FeedbackForm onClose={() => setShowFeedback(false)} />
+            </div>
+          </div>
+        )}          
+
+      
     </div>
   );
 }

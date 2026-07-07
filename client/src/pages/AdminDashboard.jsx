@@ -5,7 +5,7 @@ import AdminSettings from "./AdminSettings";
 import { 
   LayoutDashboard, ClipboardList, Users, CheckCircle, 
   Settings, Search, Bell, Activity, ShieldCheck, 
-  Plus, X, UserPlus, LogOut, Clock, XCircle, Menu
+  Plus, X, UserPlus, LogOut, Clock, XCircle, Menu, MessageSquare, Star
 } from "lucide-react";
 
 // --- Leaflet Map Configurations ---
@@ -14,25 +14,26 @@ import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 
 const API_URL = import.meta.env.VITE_API_URL || "https://sahayak-backend-tk6h.onrender.com";
+// const API_URL = "http://localhost:5000"; // just for testing
 
 // --- Dynamic Color-Coded Leaflet Marker Generator ---
 const createColoredMarker = (status) => {
-  let color = "#EF4444"; // Default: Red 🎈
+  let color = "#EF4444"; // Default: Red 
   
   switch (status?.toLowerCase()) {
     case "pending":
-      color = "#EF4444"; // Red 🎈
+      color = "#EF4444"; // Red 
       break;
     case "assigned":
     case "approved":
-      color = "#3B82F6"; // Blue 🚙
+      color = "#3B82F6"; // Blue 
       break;
     case "completed":
-      color = "#F59E0B"; // Yellow 🟡
+      color = "#F59E0B"; // Yellow 
       break;
     case "verified":
     case "resolved":
-      color = "#00FF00"; // Green 🟢
+      color = "#00FF00"; // Green 
       break;
     case "rejected":
       color = "#6B7280";     // gray 
@@ -89,6 +90,10 @@ export default function AdminDashboard() {
   const [showNotifications, setShowNotifications] = useState(false);
   const notificationRef = useRef(null);
   const bellRef = useRef(null);
+  const [feedbacks, setFeedbacks] = useState([]);
+  const [showFeedbackPopup, setShowFeedbackPopup] = useState(false);
+  const feedbackPopupRef = useRef(null);
+  const feedbackBellRef = useRef(null);
   
   // Mobile Sidebar State Drawer Toggle
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -234,6 +239,16 @@ export default function AdminDashboard() {
 
       }
 
+      // fedback popup 
+      if (
+        feedbackPopupRef.current &&
+        !feedbackPopupRef.current.contains(event.target) &&
+        feedbackBellRef.current &&
+        !feedbackBellRef.current.contains(event.target)
+      ) {
+        setShowFeedbackPopup(false);
+      }
+
     };
 
     document.addEventListener(
@@ -251,6 +266,24 @@ export default function AdminDashboard() {
       );
 
     };
+  }, []);
+
+  useEffect(() => {
+    const fetchFeedbacks = async () => {
+      try {
+        const res = await fetch(`${API_URL}/api/feedback`);
+        console.log(res.status);
+        const data = await res.json();
+        console.log(data);
+        if (Array.isArray(data)) {
+          setFeedbacks(data);
+        }
+      } catch (err) {
+        console.error("Failed to collect backend citizen feedback:", err);
+      }
+    };
+    
+    fetchFeedbacks();
   }, []);
 
   const handleAuth = async (e) => {
@@ -480,88 +513,200 @@ export default function AdminDashboard() {
 
       {/* MAIN CONTENT AREA */}
       <main className="flex-1 flex flex-col min-w-0">
-        {/* RESPONSIVE HEADER CONTAINER */}
-        <header className="min-h-20 flex flex-col gap-3 px-3 md:px-8 py-3 md:py-4 border-b border-[#1C223C] z-30 bg-[#050816]">
-          <div className="flex items-center justify-between w-full md:w-auto gap-4">
-            {/* Hamburger Button for Mobile Viewports */}
+        {/* ================= FULLY RESPONSIVE HEADER CONTAINER ================= */}
+        <header className="h-20 w-full flex items-center justify-between px-4 sm:px-6 border-b border-[#1C223C] bg-[#050816] z-30 sticky top-0">
+          
+          {/* LEFT SIDE: Hamburger & Search Input */}
+          <div className="flex items-center gap-3 sm:gap-4 flex-1 max-w-xs sm:max-w-md">
+            {/* Mobile Hamburger Drawer Trigger */}
             <button 
               onClick={() => setIsMobileMenuOpen(true)}
-              className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white bg-[#11162B] border border-[#1C223C]"
+              className="lg:hidden p-2 rounded-xl text-gray-400 hover:text-white bg-[#11162B] border border-[#1C223C] shrink-0"
               aria-label="Open Menu"
             >
-              <Menu size={20} />
+              <Menu size={18} />
             </button>
 
-            {/* Responsive Input Frame */}
-            <div className="relative w-full md:w-96 flex-1 md:flex-none">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+            {/* Responsive Input Wrapper */}
+            <div className="relative w-full">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
               <input
                 type="text"
-                placeholder="Search incidents..."
+                placeholder={window.innerWidth < 640 ? "Search..." : "Search incidents..."}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full bg-[#11162B] border border-[#1C223C] rounded-full py-2 pl-10 pr-4 text-sm text-white outline-none focus:border-[#F97316]"
+                className="w-full bg-[#11162B] border border-[#1C223C] rounded-full py-2 pl-9 pr-3 sm:pl-11 sm:pr-4 text-xs sm:text-sm text-white outline-none focus:border-[#F97316] transition-all"
               />
             </div>
           </div>
           
-          <div className="flex items-center justify-between md:justify-end gap-3 md:gap-6 relative w-full">
+          {/* RIGHT SIDE: Action Controls (Auth Badge + Notification Toggles) */}
+          <div className="flex items-center gap-2 sm:gap-4 ml-2 shrink-0">
+            
+            {/* Auth Session Identity Display */}
             {!user ? (
-              <button onClick={() => { setShowAuth(true); setIsLogin(true); }} className="text-sm font-bold text-gray-400 hover:text-white">Login / Sign Up</button>
+              <button 
+                onClick={() => { setShowAuth(true); setIsLogin(true); }} 
+                className="text-xs sm:text-sm font-bold text-gray-400 hover:text-white px-1 sm:px-2 whitespace-nowrap"
+              >
+                Sign In
+              </button>
             ) : (
-              <div className="flex items-center gap-3 bg-[#11162B] px-3 py-1.5 rounded-full border border-[#1C223C]">
-                <span className="text-xs font-bold text-gray-300 hidden sm:block">{user.fullName || "Admin"}</span>
-                <button onClick={handleLogout} className="text-gray-500 hover:text-red-500"><LogOut size={16} /></button>
+              <div className="flex items-center gap-2 bg-[#11162B] px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full border border-[#1C223C]">
+                {/* Hide long name text string on extra small viewports */}
+                <span className="text-[11px] sm:text-xs font-bold text-gray-300 hidden md:block max-w-[100px] truncate">
+                  {user.fullName || "Admin"}
+                </span>
+                <button 
+                  onClick={handleLogout} 
+                  className="text-gray-500 hover:text-red-500 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut size={14} />
+                </button>
               </div>
             )}
 
-            <div className="flex items-center gap-4 border-l border-[#1C223C] pl-6">
-              <div
-                ref={bellRef}
-                onClick={() => setShowNotifications(!showNotifications)}
-                className="relative p-2 bg-[#11162B] rounded-full border border-[#1C223C] cursor-pointer hover:bg-[#1C223C]"
-              >
-                <Bell size={18}/>
-                {notifications.filter(n => !n.read).length > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[10px] font-bold px-1.5 rounded-full min-w-[18px] text-center">
-                    {notifications.filter(n => !n.read).length}
-                  </span>
-                )}
-              </div>
+            {/* Icons Context Wrapper Panel */}
+            <div className="flex items-center gap-2 sm:gap-3 border-l border-[#1C223C] pl-2 sm:pl-4 relative">
               
-              {showNotifications && (
-                <div ref={notificationRef} className="absolute top-full mt-2 right-0 w-[90vw] max-w-md max-h-[500px] overflow-y-auto bg-[#0A0F24] border border-[#1C223C] rounded-3xl shadow-2xl z-50">
-                  <div className="p-4 border-b border-[#1C223C] flex justify-between items-center">
-                    <h3 className="font-bold">Notifications</h3>
-                    {notifications.some(n => !n.read) && (
-                      <button
-                        onClick={markAllAsRead}
-                        className="text-xs font-bold text-orange-500 hover:text-orange-400"
-                      >
-                        Mark All Read
-                      </button>
-                    )}
-                  </div>
-
-                  {notifications.length > 0 ? (
-                    notifications.map(notification => (
-                      <div
-                        key={notification._id}
-                        onClick={() => markAsRead(notification._id)}
-                        className={`p-4 border-b border-[#1C223C] hover:bg-[#11162B] cursor-pointer ${notification.read ? "opacity-50" : "bg-orange-500/5"}`}
-                      >
-                        <p className="font-bold text-orange-500">{notification.title}</p>
-                        <p className="text-sm text-gray-400 mt-1">{notification.message}</p>
-                      </div>
-                    ))
-                  ) : (
-                    <p className="p-6 text-center text-gray-500">No notifications</p>
+              {/* --- 1. CITIZEN FEEDBACK POPUP DROPDOWN TRIGGER --- */}
+              <div className="relative">
+                <div
+                  ref={feedbackBellRef}
+                  onClick={() => {
+                    setShowFeedbackPopup(!showFeedbackPopup);
+                    setShowNotifications(false);
+                  }}
+                  className="p-1.5 sm:p-2 bg-[#11162B] rounded-full border border-[#1C223C] cursor-pointer hover:bg-[#1C223C] text-gray-400 hover:text-white transition-all"
+                  title="View Citizen Feedback"
+                >
+                  <MessageSquare size={16} className={feedbacks.length > 0 ? "text-orange-400" : ""} />
+                  {feedbacks.length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[16px] text-center">
+                      {feedbacks.length}
+                    </span>
                   )}
                 </div>
-              )}
-              <div onClick={() => !user && setShowAuth(true)} className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-[#1C223C] cursor-pointer ${user ? 'bg-gradient-to-tr from-orange-600 to-yellow-500' : 'bg-[#11162B]'}`}>
-                <span className="text-sm font-black text-white">{user ? user.fullName.charAt(0).toUpperCase() : <UserPlus size={18} className="text-gray-500"/>}</span>
+
+                {/* --- CITIZEN FEEDBACK FLOATING POPUP CARD --- */}
+                {showFeedbackPopup && (
+                  <div 
+                    ref={feedbackPopupRef} 
+                    className="absolute top-full mt-3 right-[-50px] sm:right-0 w-[88vw] sm:w-[400px] max-h-[400px] overflow-y-auto bg-[#0A0F24] border border-[#1C223C] rounded-2xl shadow-2xl z-50 custom-scrollbar animate-in fade-in slide-in-from-top-2 duration-200"
+                  >
+                    <div className="p-3.5 border-b border-[#1C223C] flex justify-between items-center sticky top-0 bg-[#0A0F24] z-10">
+                      <div>
+                        <h3 className="font-bold text-white text-xs sm:text-sm">Citizen Feedback Feed</h3>
+                        <p className="text-[9px] text-gray-500">Live community logs</p>
+                      </div>
+                      <span className="text-[10px] font-black px-2 py-0.5 rounded bg-orange-500/10 text-orange-400">
+                        Total: {feedbacks.length}
+                      </span>
+                    </div>
+
+                    <div className="divide-y divide-[#1C223C]">
+                      {feedbacks.length > 0 ? (
+                        feedbacks.map((item) => (
+                          <div key={item._id} className="p-3.5 hover:bg-[#11162B]/50 transition-colors space-y-2">
+                            <div className="flex justify-between items-start gap-2">
+                              <div className="min-w-0 flex-1">
+                                <h4 className="font-bold text-xs text-white truncate">{item.fullName}</h4>
+                                <p className="text-[10px] text-gray-500 truncate">{item.email}</p>
+                              </div>
+                              <div className="flex gap-0.5 bg-[#11162B] px-1.5 py-0.5 rounded border border-[#1C223C] shrink-0">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                  <Star
+                                    key={star}
+                                    size={9}
+                                    className={star <= item.rating ? "text-orange-400" : "text-gray-700"}
+                                    fill={star <= item.rating ? "currentColor" : "none"}
+                                  />
+                                ))}
+                              </div>
+                            </div>
+                            <p className="text-xs text-gray-300 bg-[#050816]/60 rounded-xl p-2.5 border border-[#1C223C]/50 italic break-words">
+                              "{item.feedback}"
+                            </p>
+                            <div className="text-[9px] text-gray-600 font-mono text-right">
+                              {item.timestamp ? new Date(item.timestamp).toLocaleString() : ""}
+                            </div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="p-8 text-center text-gray-500 text-xs italic">
+                          No feedback entries recorded yet.
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
+
+              {/* --- 2. SYSTEM NOTIFICATION DROP MENU TRIGGER --- */}
+              <div className="relative">
+                <div
+                  ref={bellRef}
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowFeedbackPopup(false);
+                  }}
+                  className="p-1.5 sm:p-2 bg-[#11162B] rounded-full border border-[#1C223C] cursor-pointer hover:bg-[#1C223C] text-gray-400 hover:text-white transition-all"
+                >
+                  <Bell size={16}/>
+                  {notifications.filter(n => !n.read).length > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-orange-500 text-white text-[9px] font-bold px-1 rounded-full min-w-[16px] text-center">
+                      {notifications.filter(n => !n.read).length}
+                    </span>
+                  )}
+                </div>
+                
+                {showNotifications && (
+                  <div 
+                    ref={notificationRef} 
+                    className="absolute top-full mt-3 right-[-24px] sm:right-0 w-[88vw] sm:w-[360px] max-h-[450px] overflow-y-auto bg-[#0A0F24] border border-[#1C223C] rounded-2xl shadow-2xl z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+                  >
+                    <div className="p-3.5 border-b border-[#1C223C] flex justify-between items-center bg-[#0A0F24] sticky top-0 z-10">
+                      <h3 className="font-bold text-xs sm:text-sm">Notifications</h3>
+                      {notifications.some(n => !n.read) && (
+                        <button
+                          onClick={markAllAsRead}
+                          className="text-[11px] font-bold text-orange-500 hover:text-orange-400"
+                        >
+                          Mark All Read
+                        </button>
+                      )}
+                    </div>
+                    <div className="divide-y divide-[#1C223C]">
+                      {notifications.length > 0 ? (
+                        notifications.map(notification => (
+                          <div
+                            key={notification._id}
+                            onClick={() => markAsRead(notification._id)}
+                            className={`p-3.5 transition-colors cursor-pointer text-left hover:bg-[#11162B] ${notification.read ? "opacity-50" : "bg-orange-500/5"}`}
+                          >
+                            <p className="font-bold text-xs text-orange-500 break-words">{notification.title}</p>
+                            <p className="text-xs text-gray-400 mt-1 break-words">{notification.message}</p>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="p-6 text-center text-xs text-gray-500 italic">No notifications</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* --- 3. PROFILE INITIAL BADGE --- */}
+              <div 
+                onClick={() => !user && setShowAuth(true)} 
+                className={`w-8 h-8 sm:w-9 sm:h-9 flex items-center justify-center rounded-full border border-[#1C223C] cursor-pointer shrink-0 transition-transform active:scale-95 ${user ? 'bg-gradient-to-tr from-orange-600 to-yellow-500' : 'bg-[#11162B]'}`}
+              >
+                <span className="text-xs font-black text-white">
+                  {user ? user.fullName.charAt(0).toUpperCase() : <UserPlus size={14} className="text-gray-500"/>}
+                </span>
+              </div>
+
             </div>
           </div>
         </header>
