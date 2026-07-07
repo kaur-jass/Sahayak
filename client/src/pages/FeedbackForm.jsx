@@ -65,7 +65,7 @@ export default function FeedbackForm({ onClose }) {
   };
 
   return (
-    <div className="relative w-full max-w-xl mx-auto rounded-2xl border border-[#2D2319] bg-[#0E1425]/95 backdrop-blur-xl p-5 sm:p-7 shadow-2xl max-h-[92vh] overflow-y-auto custom-scrollbar">
+    <div className="relative w-full max-w-xl mx-auto rounded-2xl border border-[#2D2319] bg-[#0E1425]/95 backdrop-blur-xl p-5 sm:p-7 shadow-2xl max-h-[75vh] sm: max-h-[90vh] overflow-y-auto custom-scrollbar">
 
       {/* Close Button */}
       <button

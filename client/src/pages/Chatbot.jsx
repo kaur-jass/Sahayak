@@ -155,9 +155,13 @@ export default function Chatbot() {
           fixed
           bottom-6
           right-6
+          sm:bottom-6
+          sm:right-6
           z-[9999]
-          w-16
-          h-16
+          w-12
+          h-12
+          sm:w-16
+          sm:h-16
           rounded-full
           bg-orange-500
           text-white
@@ -169,21 +173,24 @@ export default function Chatbot() {
           justify-center
         "
       >
-        <span className="text-xl font-bold">💬</span>
+        <span className="text-base sm:text-xl font-bold">💬</span>
       </button>
 
       {isOpen && (
         <div
           className="
             fixed
-            bottom-24
-            right-4
-            left-4
-            md:left-auto
-            md:right-6
+            left-3
+            right-3
+            bottom-16
+            sm:left-auto
+            sm:right-6
+            sm:bottom-24
             w-auto
-            md:w-[420px]
-            h-[75vh]
+            sm:w-[420px]
+            md:w-[450px]
+            h-[70vh]
+            sm:h-[75vh]
             max-h-[650px]
             bg-[#0A1025]
             border
@@ -242,7 +249,7 @@ export default function Chatbot() {
               gap-2
               border-b
               border-[#232B4C]
-              max-h-[110px]
+              max-h-[80px]  sm:max-h-[110px]
               overflow-y-auto
             "
           >
@@ -348,7 +355,7 @@ export default function Chatbot() {
               onClick={() => sendMessage()}
               className="
                 bg-orange-500
-                px-5
+                px-5 sm:px-6
                 rounded-xl
                 text-white
                 font-semibold

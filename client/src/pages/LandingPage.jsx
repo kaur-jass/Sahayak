@@ -168,9 +168,9 @@ export default function LandingPage() {
       <div className="fixed bottom-6 left-6 z-50">
           <button
             onClick={() => setShowFeedback((prev) => !prev)}
-            className="w-16 h-16 rounded-full bg-orange-500 hover:bg-orange-600 shadow-2xl flex items-center justify-center transition-all hover:scale-110"
+            className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-orange-500 hover:bg-orange-600 shadow-2xl flex items-center justify-center transition-all hover:scale-110"
           >
-            <MessageCircle className="text-white" size={28} />
+            <MessageCircle className="text-white w-5 h-5 sm:w-7 sm:h-7" />
           </button>
         </div>
 
@@ -181,7 +181,7 @@ export default function LandingPage() {
               onClick={() => setShowFeedback(false)}
             />
 
-            <div className="fixed left-6 bottom-24 z-[1000] w-[450px] max-w-[90vw]">
+            <div className="fixed left-3 right-3 bottom-24 sm:left-6 sm:right-auto sm:w-[430px] md:w-[450px] z-[1000]">
               <FeedbackForm onClose={() => setShowFeedback(false)} />
             </div>
           </div>
